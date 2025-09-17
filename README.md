@@ -227,37 +227,25 @@ When reporting bugs, please include:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see below for details:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for full details.
 
-```
-MIT License
+### Third-Party Licenses
 
-Copyright (c) 2024 Dmitry Molchanov
+This project includes:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+- **[Excalidraw](https://github.com/excalidraw/excalidraw)** - MIT License © 2020 Excalidraw
+- **Virgil Font** - SIL Open Font License 1.1 © 2020 Excalidraw
+- **Excalifont** - SIL Open Font License 1.1 © 2024 Excalidraw
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+The complete text of all licenses, including the MIT License for this project and the SIL Open Font License (OFL-1.1) for the included fonts, can be found in the [LICENSE](LICENSE) file.
 
 ## 🙏 Acknowledgments
 
-- [Excalidraw](https://github.com/excalidraw/excalidraw) - The amazing drawing tool that powers this presenter
-- [React](https://reactjs.org/) - For the robust UI framework
-- [Vite](https://vitejs.dev/) - For the lightning-fast build tool
+- **[Excalidraw](https://github.com/excalidraw/excalidraw)** - The amazing open-source drawing tool that powers this presenter. Excalidraw is released under the MIT License.
+- **Excalidraw Fonts** - This project includes Virgil and Excalifont, both released under the OFL-1.1 license, freely available for personal and commercial use.
+- **[React](https://reactjs.org/)** - For the robust UI framework
+- **[Vite](https://vitejs.dev/)** - For the lightning-fast build tool
+- **Open Source Community** - For making projects like this possible through collaborative development
 
 ## 📧 Contact
 
