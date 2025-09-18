@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import { exportToBlob } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "../types/excalidraw";
 
 interface ExcalidrawFrame {
@@ -41,10 +42,23 @@ export async function exportFramesToPDF(
       // Wait for the scene to update
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Export the current view as an image
-      const blob = await excalidrawAPI.exportToBlob({
+      // Get current scene elements and app state
+      const elements = excalidrawAPI.getSceneElements();
+      const appState = excalidrawAPI.getAppState();
+      const files = excalidrawAPI.getFiles();
+
+      // Export the current view as an image using the standalone function
+      const blob = await exportToBlob({
+        elements,
+        appState: {
+          ...appState,
+          exportBackground: true,
+          viewBackgroundColor: "#ffffff",
+        },
+        files,
         mimeType: "image/png",
         quality: 0.92,
+        exportPadding: 10,
       });
 
       const imageUrl = URL.createObjectURL(blob);
@@ -79,22 +93,30 @@ export async function exportFramesToPDF(
       if (i < frames.length - 1) {
         pdf.addPage();
       }
+
+      // Add slide info as metadata
+      if (frames[i].name) {
+        pdf.setFontSize(10);
+        pdf.text(
+          frames[i].name || `Slide ${i + 1}`,
+          margin,
+          pageHeight - margin,
+        );
+      }
     }
 
-    // Restore original view state
-    excalidrawAPI.updateScene({
-      appState: {
-        zoom: originalState.zoom,
-        scrollX: originalState.scrollX,
-        scrollY: originalState.scrollY,
-      },
-    });
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const filename = `excalidraw-presentation-${timestamp}.pdf`;
 
     // Save the PDF
-    const filename = `excalidraw-presentation-${new Date().toISOString().slice(0, 10)}.pdf`;
     pdf.save(filename);
+
+    // Restore the original zoom and position
+    // Note: This might not perfectly restore the view, but will prevent being stuck on last frame
+    excalidrawAPI.scrollToContent(originalState.scrollX, originalState.scrollY);
   } catch (error) {
     console.error("Error exporting to PDF:", error);
-    alert("Failed to export PDF. Please try again.");
+    throw error;
   }
 }
