@@ -32,136 +32,84 @@ export async function exportFramesToPDF(
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 40;
 
-    // Save current state
-    const originalState = excalidrawAPI.getAppState();
-
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
 
-      // Get all scene elements
+      // Get all scene elements and files
       const allElements = excalidrawAPI.getSceneElements();
       const files = excalidrawAPI.getFiles();
 
-      // Filter elements that belong to this frame
-      const frameElements = allElements.filter((element: any) => {
-        // Include the frame itself
-        if (element.id === frame.id) return true;
+      // Find the actual frame element to use for export
+      const frameElement = allElements.find((el: any) => el.id === frame.id);
 
-        // Include elements that have this frame as their container
-        if (element.frameId === frame.id) return true;
+      if (!frameElement) {
+        console.warn(`Frame element not found for frame ${i + 1}`);
+        continue;
+      }
 
-        // Include elements that are within the frame bounds
-        if (
-          element.type === "text" ||
-          element.type === "rectangle" ||
-          element.type === "ellipse" ||
-          element.type === "arrow" ||
-          element.type === "line" ||
-          element.type === "freedraw" ||
-          element.type === "image"
-        ) {
-          const elementLeft = element.x;
-          const elementTop = element.y;
-          const elementRight = element.x + (element.width || 0);
-          const elementBottom = element.y + (element.height || 0);
-
-          const frameLeft = frame.x;
-          const frameTop = frame.y;
-          const frameRight = frame.x + frame.width;
-          const frameBottom = frame.y + frame.height;
-
-          // Check if element center is within frame
-          const elementCenterX = (elementLeft + elementRight) / 2;
-          const elementCenterY = (elementTop + elementBottom) / 2;
-
-          return (
-            elementCenterX >= frameLeft &&
-            elementCenterX <= frameRight &&
-            elementCenterY >= frameTop &&
-            elementCenterY <= frameBottom
-          );
-        }
-
-        return false;
-      });
-
-      // Export to canvas with specific dimensions
-      const padding = 50;
+      // Export using the frame as the boundary
+      // The exportingFrame parameter will automatically crop to the frame bounds
       const canvas = await exportToCanvas({
-        elements: frameElements,
+        elements: allElements,
         appState: {
-          ...originalState,
           exportBackground: true,
           viewBackgroundColor: "#ffffff",
           exportWithDarkMode: false,
-          scrollX: -frame.x + padding,
-          scrollY: -frame.y + padding,
-          zoom: {
-            value: 1,
-          },
         },
         files,
-        getDimensions: () => ({
-          width: frame.width + padding * 2,
-          height: frame.height + padding * 2,
-          scale: 2, // Higher resolution
-        }),
+        // This is the key: use exportingFrame to crop to the frame bounds
+        exportingFrame: frameElement,
+        exportPadding: 30, // Add padding around the frame content
       });
 
-      // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((blob) => resolve(blob!), "image/png", 0.95);
-      });
+      // Convert canvas to data URL
+      const dataUrl = canvas.toDataURL("image/png", 0.95);
 
-      const imageUrl = URL.createObjectURL(blob);
-
-      // Calculate proper scaling to fit the page while maintaining aspect ratio
+      // Get actual canvas dimensions
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
+
+      // Calculate proper scaling to fit the page while maintaining aspect ratio
       const pageContentWidth = pageWidth - margin * 2;
-      const pageContentHeight = pageHeight - margin * 2 - 30; // Extra space for slide name
-      const pageAspect = pageContentWidth / pageContentHeight;
-      const imgAspect = imgWidth / imgHeight;
+      const pageContentHeight = pageHeight - margin * 2 - 40; // Space for text
 
       let finalWidth, finalHeight;
-      if (imgAspect > pageAspect) {
-        // Image is wider than page
+      const pageAspectRatio = pageContentWidth / pageContentHeight;
+      const imgAspectRatio = imgWidth / imgHeight;
+
+      if (imgAspectRatio > pageAspectRatio) {
+        // Image is wider - fit to width
         finalWidth = pageContentWidth;
-        finalHeight = finalWidth / imgAspect;
+        finalHeight = finalWidth / imgAspectRatio;
       } else {
-        // Image is taller than page
+        // Image is taller - fit to height
         finalHeight = pageContentHeight;
-        finalWidth = finalHeight * imgAspect;
+        finalWidth = finalHeight * imgAspectRatio;
       }
 
       // Center the image on the page
       const xOffset = (pageWidth - finalWidth) / 2;
-      const yOffset = (pageHeight - finalHeight - 30) / 2;
+      const yOffset = (pageHeight - finalHeight - 40) / 2;
 
       // Add image to PDF
-      pdf.addImage(imageUrl, "PNG", xOffset, yOffset, finalWidth, finalHeight);
+      pdf.addImage(dataUrl, "PNG", xOffset, yOffset, finalWidth, finalHeight);
 
-      // Clean up
-      URL.revokeObjectURL(imageUrl);
-
-      // Add slide name at the bottom
+      // Add slide name at the bottom center
       if (frame.name) {
-        pdf.setFontSize(10);
-        pdf.setTextColor(100);
+        pdf.setFontSize(11);
+        pdf.setTextColor(60, 60, 60);
         const text = frame.name;
         const textWidth =
-          (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
+          (pdf.getStringUnitWidth(text) * 11) / pdf.internal.scaleFactor;
         const textX = (pageWidth - textWidth) / 2;
-        pdf.text(text, textX, pageHeight - 20);
+        pdf.text(text, textX, pageHeight - 25);
       }
 
-      // Add page number
-      pdf.setFontSize(8);
-      pdf.setTextColor(150);
+      // Add page number at bottom right
+      pdf.setFontSize(9);
+      pdf.setTextColor(120, 120, 120);
       const pageText = `${i + 1} / ${frames.length}`;
-      const pageTextWidth =
-        (pdf.getStringUnitWidth(pageText) * 8) / pdf.internal.scaleFactor;
-      pdf.text(pageText, pageWidth - pageTextWidth - 20, pageHeight - 20);
+      pdf.text(pageText, pageWidth - 60, pageHeight - 25);
 
       // Add a new page for the next frame (except for the last one)
       if (i < frames.length - 1) {
@@ -172,12 +120,14 @@ export async function exportFramesToPDF(
     // Generate filename with timestamp
     const timestamp = new Date()
       .toISOString()
-      .replace(/[:.]/g, "-")
-      .substring(0, 19);
+      .substring(0, 19)
+      .replace(/[T:]/g, "-");
     const filename = `presentation-${timestamp}.pdf`;
 
     // Save the PDF
     pdf.save(filename);
+
+    console.log(`PDF exported successfully: ${filename}`);
   } catch (error) {
     console.error("Error exporting to PDF:", error);
     throw error;
