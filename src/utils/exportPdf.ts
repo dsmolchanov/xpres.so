@@ -14,7 +14,7 @@ interface ExcalidrawFrame {
 export async function exportFramesToPDF(
   frames: ExcalidrawFrame[],
   excalidrawAPI: ExcalidrawImperativeAPI | null,
-  navigateToFrame: (index: number, skipAnimation: boolean) => void,
+  _navigateToFrame: (index: number, skipAnimation: boolean) => void,
 ): Promise<void> {
   if (!excalidrawAPI || frames.length === 0) {
     return;

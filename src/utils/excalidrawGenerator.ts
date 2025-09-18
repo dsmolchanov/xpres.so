@@ -130,8 +130,6 @@ function createTextElement(
   fontSize: number,
   fontFamily: number,
   frameId: string | null,
-  theme: "light" | "dark",
-  maxWidth: number = 1100,
 ): ExcalidrawElement[] {
   const lines = wrapText(text);
   const lineHeight = fontSize * 1.5;
@@ -208,8 +206,6 @@ export function generateExcalidrawSlides(
         opts.titleFontSize!,
         opts.fontFamily!,
         frameId,
-        opts.theme!,
-        opts.slideWidth! - 100,
       );
       elements.push(...titleElements);
       contentY += opts.titleFontSize! * 2;
@@ -224,8 +220,6 @@ export function generateExcalidrawSlides(
           opts.bulletFontSize!,
           opts.fontFamily!,
           frameId,
-          opts.theme!,
-          opts.slideWidth! - 130,
         );
         elements.push(...bulletElements);
         contentY += bulletElements.length * (opts.bulletFontSize! * 1.5) + 10;
@@ -239,8 +233,6 @@ export function generateExcalidrawSlides(
           opts.contentFontSize!,
           opts.fontFamily!,
           frameId,
-          opts.theme!,
-          opts.slideWidth! - 100,
         );
         elements.push(...contentElements);
         contentY += contentElements.length * (opts.contentFontSize! * 1.5) + 10;
@@ -255,8 +247,6 @@ export function generateExcalidrawSlides(
         opts.codeFontSize!,
         3,
         frameId,
-        opts.theme!,
-        opts.slideWidth! - 130,
       );
       elements.push(...codeElements);
       contentY += codeElements.length * (opts.codeFontSize! * 1.5) + 20;
@@ -271,8 +261,6 @@ export function generateExcalidrawSlides(
         opts.contentFontSize! * 0.75,
         opts.fontFamily!,
         frameId,
-        opts.theme!,
-        opts.slideWidth! - 100,
       );
       elements.push(...notesElements);
     }
