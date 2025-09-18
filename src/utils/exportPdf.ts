@@ -11,6 +11,16 @@ interface ExcalidrawFrame {
   height: number;
 }
 
+// Helper function to load image and get its dimensions
+function loadImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
 export async function exportFramesToPDF(
   frames: ExcalidrawFrame[],
   excalidrawAPI: ExcalidrawImperativeAPI | null,
@@ -30,7 +40,7 @@ export async function exportFramesToPDF(
 
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 20;
+    const margin = 40;
 
     // Save current state
     const originalState = excalidrawAPI.getAppState();
@@ -47,73 +57,112 @@ export async function exportFramesToPDF(
       const appState = excalidrawAPI.getAppState();
       const files = excalidrawAPI.getFiles();
 
-      // Export the current view as an image using the standalone function
+      // Filter elements to only include those within or intersecting with the current frame
+      const frame = frames[i];
+      const frameElements = elements.filter((element: any) => {
+        // Include the frame itself
+        if (element.id === frame.id) return true;
+
+        // Include elements that are inside or intersecting with the frame
+        if (element.frameId === frame.id) return true;
+
+        // Check if element is within frame bounds (with some tolerance)
+        const tolerance = 50;
+        const elementRight = element.x + (element.width || 0);
+        const elementBottom = element.y + (element.height || 0);
+        const frameRight = frame.x + frame.width;
+        const frameBottom = frame.y + frame.height;
+
+        return !(
+          element.x > frameRight + tolerance ||
+          elementRight < frame.x - tolerance ||
+          element.y > frameBottom + tolerance ||
+          elementBottom < frame.y - tolerance
+        );
+      });
+
+      // Export only the frame content with proper bounds
       const blob = await exportToBlob({
-        elements,
+        elements: frameElements,
         appState: {
           ...appState,
           exportBackground: true,
           viewBackgroundColor: "#ffffff",
+          exportWithDarkMode: false,
         },
         files,
         mimeType: "image/png",
-        quality: 0.92,
-        exportPadding: 10,
+        quality: 0.95,
+        exportPadding: 20,
+        getDimensions: () => ({
+          width: frame.width + 40,
+          height: frame.height + 40,
+          scale: 2, // Higher resolution for better quality
+        }),
       });
 
       const imageUrl = URL.createObjectURL(blob);
 
-      // Add image to PDF
-      // Center and scale the image to fit the page
-      const imgWidth = frames[i].width;
-      const imgHeight = frames[i].height;
-      const pageAspect = (pageWidth - margin * 2) / (pageHeight - margin * 2);
-      const imgAspect = imgWidth / imgHeight;
+      // Load the image to get actual dimensions
+      const img = await loadImage(imageUrl);
+      const actualImgWidth = img.naturalWidth;
+      const actualImgHeight = img.naturalHeight;
+
+      // Calculate proper scaling to fit the page while maintaining aspect ratio
+      const pageContentWidth = pageWidth - margin * 2;
+      const pageContentHeight = pageHeight - margin * 2;
+      const pageAspect = pageContentWidth / pageContentHeight;
+      const imgAspect = actualImgWidth / actualImgHeight;
 
       let finalWidth, finalHeight;
       if (imgAspect > pageAspect) {
         // Image is wider than page
-        finalWidth = pageWidth - margin * 2;
+        finalWidth = pageContentWidth;
         finalHeight = finalWidth / imgAspect;
       } else {
         // Image is taller than page
-        finalHeight = pageHeight - margin * 2;
+        finalHeight = pageContentHeight;
         finalWidth = finalHeight * imgAspect;
       }
 
+      // Center the image on the page
       const xOffset = (pageWidth - finalWidth) / 2;
       const yOffset = (pageHeight - finalHeight) / 2;
 
+      // Add image to PDF with correct aspect ratio
       pdf.addImage(imageUrl, "PNG", xOffset, yOffset, finalWidth, finalHeight);
 
       // Clean up the URL
       URL.revokeObjectURL(imageUrl);
 
+      // Add slide name at the bottom if present
+      if (frames[i].name) {
+        pdf.setFontSize(10);
+        pdf.setTextColor(100);
+        const text = frames[i].name || `Slide ${i + 1}`;
+        const textWidth =
+          (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
+        const textX = (pageWidth - textWidth) / 2;
+        pdf.text(text, textX, pageHeight - 20);
+      }
+
       // Add a new page for the next frame (except for the last one)
       if (i < frames.length - 1) {
         pdf.addPage();
       }
-
-      // Add slide info as metadata
-      if (frames[i].name) {
-        pdf.setFontSize(10);
-        pdf.text(
-          frames[i].name || `Slide ${i + 1}`,
-          margin,
-          pageHeight - margin,
-        );
-      }
     }
 
     // Generate filename with timestamp
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const filename = `excalidraw-presentation-${timestamp}.pdf`;
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[:.]/g, "-")
+      .substring(0, 19);
+    const filename = `presentation-${timestamp}.pdf`;
 
     // Save the PDF
     pdf.save(filename);
 
     // Restore the original zoom and position
-    // Note: This might not perfectly restore the view, but will prevent being stuck on last frame
     excalidrawAPI.scrollToContent(originalState.scrollX, originalState.scrollY);
   } catch (error) {
     console.error("Error exporting to PDF:", error);
