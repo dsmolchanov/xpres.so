@@ -150,6 +150,77 @@ The PDF export feature:
 - Exports at high resolution for print quality
 - Automatically names files with timestamp
 
+## 🚀 Deployment
+
+### Deploy to Vercel (Recommended)
+
+The easiest way to deploy this app is using [Vercel](https://vercel.com):
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdsmolchanov%2Fxpres.so&env=VITE_GOOGLE_GEMINI_API_KEY&envDescription=Google%20Gemini%20API%20Key%20for%20AI%20features&envLink=https%3A%2F%2Fmakersuite.google.com%2Fapp%2Fapikey&project-name=excalidraw-presenter&repository-name=excalidraw-presenter)
+
+#### Manual Deployment to Vercel
+
+1. **Fork and clone the repository**
+
+   ```bash
+   git clone https://github.com/yourusername/xpres.so.git
+   ```
+
+2. **Install Vercel CLI** (optional)
+
+   ```bash
+   npm i -g vercel
+   ```
+
+3. **Deploy using CLI**
+
+   ```bash
+   vercel
+   ```
+
+4. **Or deploy via Vercel Dashboard**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Add environment variable: `VITE_GOOGLE_GEMINI_API_KEY`
+   - Deploy
+
+#### Environment Variables for Vercel
+
+Set these in your Vercel dashboard under Project Settings → Environment Variables:
+
+| Variable                     | Description                           | Required             |
+| ---------------------------- | ------------------------------------- | -------------------- |
+| `VITE_GOOGLE_GEMINI_API_KEY` | Google Gemini API key for AI features | No (but recommended) |
+
+### Deploy to Other Platforms
+
+#### Netlify
+
+1. Build command: `npm run build`
+2. Publish directory: `dist`
+3. Add environment variables in Netlify dashboard
+
+#### GitHub Pages
+
+1. Install gh-pages: `npm install --save-dev gh-pages`
+2. Add to package.json scripts:
+   ```json
+   "deploy": "vite build --base=/xpres.so/ && gh-pages -d dist"
+   ```
+3. Run: `npm run deploy`
+
+#### Render
+
+1. Build command: `npm run build`
+2. Static site path: `dist`
+3. Add environment variables in Render dashboard
+
+#### Self-Hosting
+
+1. Build the project: `npm run build`
+2. Serve the `dist` folder with any static file server (nginx, Apache, etc.)
+3. Configure environment variables on your server
+
 ## 🛠️ Development
 
 ### Available Scripts
@@ -163,9 +234,6 @@ npm run build
 
 # Preview production build locally
 npm run preview
-
-# Run linter
-npm run lint
 
 # Type checking
 npm run typecheck
@@ -192,6 +260,7 @@ excalidraw-presenter/
 │   └── main.tsx            # Entry point
 ├── public/                 # Static assets
 ├── .env.example            # Environment variables template
+├── vercel.json             # Vercel configuration
 └── package.json            # Dependencies and scripts
 ```
 
@@ -227,6 +296,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🚀 Recent Updates
 
+- **Vercel Deployment Ready**: Added configuration for easy deployment to Vercel
 - **Fixed PDF Export**: Complete frame content capture with proper aspect ratios
 - **AI Slide Generation**: Integration with Google Gemini 2.0 Flash for intelligent text parsing
 - **Smart Text Wrapping**: Automatic text wrapping for better slide layouts
