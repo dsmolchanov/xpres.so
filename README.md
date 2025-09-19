@@ -2,6 +2,8 @@
 
 A powerful presentation tool built on top of Excalidraw that enables frame-based presentations with smooth animations, PDF export, AI-powered slide generation, and professional presentation controls.
 
+🌐 **[Live Demo](https://www.xpres.so/)** | 📦 **[GitHub](https://github.com/dsmolchanov/xpres.so)** | 🚀 **[Deploy Your Own](#-deployment)**
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![React](https://img.shields.io/badge/React-18.3.1-61dafb.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-blue.svg)
@@ -19,6 +21,10 @@ A powerful presentation tool built on top of Excalidraw that enables frame-based
 - 🎨 **Full Excalidraw Features** - All drawing and collaboration tools available
 - 📝 **Markdown Support** - Create slides from markdown text with automatic parsing
 - ✨ **Smart Text Wrapping** - Automatic text wrapping for better slide layouts
+
+## 🎯 Try It Now
+
+Visit **[xpres.so](https://www.xpres.so/)** to try the live demo - no installation required!
 
 ## 🚀 Quick Start
 
@@ -296,7 +302,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🚀 Recent Updates
 
-- **Vercel Deployment Ready**: Added configuration for easy deployment to Vercel
+- **Live Demo Available**: Try it now at [xpres.so](https://www.xpres.so/)
+- **Vercel Deployment Ready**: Added configuration for easy deployment
 - **Fixed PDF Export**: Complete frame content capture with proper aspect ratios
 - **AI Slide Generation**: Integration with Google Gemini 2.0 Flash for intelligent text parsing
 - **Smart Text Wrapping**: Automatic text wrapping for better slide layouts
