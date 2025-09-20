@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { parseMarkdownToSlides } from "../utils/slideParser";
 import { parseTextWithAI } from "../utils/slideParserWithAI";
+import { parseTextWithXAI } from "../utils/slideParserWithXAI";
 import {
   generateExcalidrawPresentation,
   GeneratorOptions,
 } from "../utils/excalidrawGenerator";
 import { geminiService } from "../utils/geminiService";
-import { FileText, Wand2, X, Settings, Sparkles } from "lucide-react";
+import { xaiService } from "../utils/xaiService";
+import { FileText, Wand2, X, Settings, Sparkles, Zap } from "lucide-react";
 
 interface SlideGeneratorProps {
   onGenerate: (data: { elements: any[]; appState: any }) => void;
@@ -51,13 +53,28 @@ Finally, end with predictions for the next decade and a call to action for respo
 
 Make sure to include some code examples for machine learning if possible.`;
 
+type AIModel = "gemini" | "xai" | "none";
+
 export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
   onGenerate,
   onClose,
 }) => {
   const [input, setInput] = useState("");
   const [showOptions, setShowOptions] = useState(false);
-  const [useAI, setUseAI] = useState(geminiService.isAvailable());
+  const geminiAvailable = geminiService.isAvailable();
+  const xaiAvailable = xaiService.isAvailable();
+  const anyAIAvailable = geminiAvailable || xaiAvailable;
+
+  // Set default AI model based on availability
+  const getDefaultModel = (): AIModel => {
+    if (geminiAvailable) return "gemini";
+    if (xaiAvailable) return "xai";
+    return "none";
+  };
+
+  const [useAI, setUseAI] = useState(anyAIAvailable);
+  const [selectedModel, setSelectedModel] =
+    useState<AIModel>(getDefaultModel());
   const [isProcessing, setIsProcessing] = useState(false);
   const [options, setOptions] = useState<GeneratorOptions>({
     slideWidth: 800,
@@ -77,6 +94,7 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
     console.log("Input text:", input);
     console.log("Input length:", input.length);
     console.log("Use AI:", useAI);
+    console.log("Selected Model:", selectedModel);
 
     if (!input.trim()) {
       alert("Please enter some text to generate slides");
@@ -87,10 +105,14 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
     try {
       let slides;
 
-      if (useAI) {
+      if (useAI && selectedModel !== "none") {
         // Use AI to parse unstructured or structured text
-        console.log("Parsing with AI...");
-        slides = await parseTextWithAI(input);
+        console.log(`Parsing with AI (${selectedModel})...`);
+        if (selectedModel === "gemini") {
+          slides = await parseTextWithAI(input);
+        } else if (selectedModel === "xai") {
+          slides = await parseTextWithXAI(input);
+        }
         console.log("AI parsed slides:", slides);
       } else {
         // Use traditional markdown parsing
@@ -134,7 +156,16 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
     setInput(sample);
   };
 
-  const aiAvailable = geminiService.isAvailable();
+  const getModelDisplayName = (model: AIModel): string => {
+    switch (model) {
+      case "gemini":
+        return "Google Gemini 2.0 Flash";
+      case "xai":
+        return "xAI Grok-4 Fast";
+      default:
+        return "No AI";
+    }
+  };
 
   return (
     <div
@@ -190,7 +221,7 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
 
         <div style={{ marginBottom: "16px" }}>
           <div style={{ marginBottom: "12px" }}>
-            {aiAvailable ? (
+            {anyAIAvailable ? (
               <div
                 style={{
                   padding: "12px",
@@ -200,30 +231,71 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                   marginBottom: "12px",
                 }}
               >
-                <label
+                <div
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
-                    cursor: "pointer",
+                    gap: "12px",
+                    flexWrap: "wrap",
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={useAI}
-                    onChange={(e) => setUseAI(e.target.checked)}
-                    style={{ width: "18px", height: "18px" }}
-                  />
-                  <Sparkles size={18} color={useAI ? "#3b82f6" : "#666"} />
-                  <span
+                  <label
                     style={{
-                      fontWeight: useAI ? "bold" : "normal",
-                      color: useAI ? "#3b82f6" : "#333",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      cursor: "pointer",
                     }}
                   >
-                    Use AI to parse text (Gemini 2.0 Flash Exp)
-                  </span>
-                </label>
+                    <input
+                      type="checkbox"
+                      checked={useAI}
+                      onChange={(e) => {
+                        setUseAI(e.target.checked);
+                        if (e.target.checked && selectedModel === "none") {
+                          setSelectedModel(getDefaultModel());
+                        }
+                      }}
+                      style={{ width: "18px", height: "18px" }}
+                    />
+                    <Sparkles size={18} color={useAI ? "#3b82f6" : "#666"} />
+                    <span
+                      style={{
+                        fontWeight: useAI ? "bold" : "normal",
+                        color: useAI ? "#3b82f6" : "#333",
+                      }}
+                    >
+                      Use AI to parse text
+                    </span>
+                  </label>
+
+                  {useAI && (
+                    <select
+                      value={selectedModel}
+                      onChange={(e) =>
+                        setSelectedModel(e.target.value as AIModel)
+                      }
+                      style={{
+                        padding: "4px 8px",
+                        border: "1px solid #3b82f6",
+                        borderRadius: "6px",
+                        backgroundColor: "white",
+                        color: "#3b82f6",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {geminiAvailable && (
+                        <option value="gemini">🔮 Gemini 2.0 Flash</option>
+                      )}
+                      {xaiAvailable && (
+                        <option value="xai">⚡ Grok-4 Fast</option>
+                      )}
+                    </select>
+                  )}
+                </div>
+
                 <p
                   style={{
                     margin: "8px 0 0 26px",
@@ -232,7 +304,7 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                   }}
                 >
                   {useAI
-                    ? "AI will intelligently structure your text into slides, even from unstructured content"
+                    ? `AI (${getModelDisplayName(selectedModel)}) will intelligently structure your text into slides`
                     : "Using traditional markdown parsing (separate slides with ---)"}
                 </p>
               </div>
@@ -247,9 +319,8 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                 }}
               >
                 <p style={{ margin: 0, fontSize: "13px", color: "#92400e" }}>
-                  ⚠️ Gemini API key not configured. Add
-                  VITE_GOOGLE_GEMINI_API_KEY to your .env file to enable AI
-                  parsing.
+                  ⚠️ No AI API keys configured. Add VITE_GOOGLE_GEMINI_API_KEY
+                  or VITE_XAI_API_KEY to your .env file to enable AI parsing.
                 </p>
               </div>
             )}
@@ -494,7 +565,9 @@ Content for slide 1
               backgroundColor:
                 input.trim() && !isProcessing
                   ? useAI
-                    ? "#3b82f6"
+                    ? selectedModel === "xai"
+                      ? "#000000"
+                      : "#3b82f6"
                     : "#6965db"
                   : "#e0e0e0",
               color: "white",
@@ -523,7 +596,15 @@ Content for slide 1
               </>
             ) : (
               <>
-                {useAI ? <Sparkles size={18} /> : <Wand2 size={18} />}
+                {useAI ? (
+                  selectedModel === "xai" ? (
+                    <Zap size={18} />
+                  ) : (
+                    <Sparkles size={18} />
+                  )
+                ) : (
+                  <Wand2 size={18} />
+                )}
                 Generate Slides
               </>
             )}
