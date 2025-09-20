@@ -1,6 +1,11 @@
+<div align="center">
+  <img src="public/logo.svg" alt="xpres.so logo" width="128" height="128" />
+
 # 🎨 Excalidraw Presenter
 
 A powerful presentation tool built on top of Excalidraw that enables frame-based presentations with smooth animations, PDF export, AI-powered slide generation, and professional presentation controls.
+
+</div>
 
 🌐 **[Live Demo](https://www.xpres.so/)** | 📦 **[GitHub](https://github.com/dsmolchanov/xpres.so)** | 🚀 **[Deploy Your Own](#-deployment)**
 
