@@ -80,7 +80,7 @@ body,
 .toolbar-buttons {
     position: fixed;
     bottom: 16px;
-    right: 16px;
+    right: 64px; /* Positioned to the left of help button */
     display: flex;
     gap: 0.5rem;
     z-index: 4; /* Same z-index as Excalidraw's UI elements */
