@@ -1,11 +1,21 @@
 <div align="center">
-  <img src="public/logo.svg" alt="xpres.so logo" width="128" height="128" />
+
+  <br/>
+
+  <img src="public/logo.svg" alt="xpres.so logo" width="600" height="400" />
+
+  <br/>
+  <br/>
 
 # 🎨 Excalidraw Presenter
 
+**Transform your text into beautiful presentations with Excalidraw's hand-drawn style**
+
+  <br/>
+
 A powerful presentation tool built on top of Excalidraw that enables frame-based presentations with smooth animations, PDF export, AI-powered slide generation, and professional presentation controls.
 
-</div>
+  <br/>
 
 🌐 **[Live Demo](https://www.xpres.so/)** | 📦 **[GitHub](https://github.com/dsmolchanov/xpres.so)** | 🚀 **[Deploy Your Own](#-deployment)**
 
@@ -13,6 +23,10 @@ A powerful presentation tool built on top of Excalidraw that enables frame-based
 ![React](https://img.shields.io/badge/React-18.3.1-61dafb.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-blue.svg)
 ![Excalidraw](https://img.shields.io/badge/Excalidraw-0.18.0-purple.svg)
+
+  <br/>
+
+</div>
 
 ## ✨ Features
 
