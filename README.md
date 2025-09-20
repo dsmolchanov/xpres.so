@@ -12,7 +12,7 @@ A powerful presentation tool built on top of Excalidraw that enables frame-based
 ## ✨ Features
 
 - 🖼️ **Frame-Based Presentations** - Use Excalidraw's native frame tool to create presentation slides
-- 🤖 **AI-Powered Slide Generation** - Generate slides from text using Google Gemini 2.0 Flash
+- 🤖 **AI-Powered Slide Generation** - Generate slides from text using Google Gemini 2.0 Flash or xAI Grok-4 Fast
 - 🎬 **Smooth Animations** - Professional zoom and pan transitions between frames
 - 📄 **High-Quality PDF Export** - Export presentations with proper frame boundaries and aspect ratios
 - 🎯 **Laser Pointer** - Automatically enabled during presentations
@@ -21,6 +21,7 @@ A powerful presentation tool built on top of Excalidraw that enables frame-based
 - 🎨 **Full Excalidraw Features** - All drawing and collaboration tools available
 - 📝 **Markdown Support** - Create slides from markdown text with automatic parsing
 - ✨ **Smart Text Wrapping** - Automatic text wrapping for better slide layouts
+- 🔄 **Multiple AI Models** - Choose between Google Gemini and xAI Grok for AI generation
 
 ## 🎯 Try It Now
 
@@ -34,6 +35,7 @@ Visit **[xpres.so](https://www.xpres.so/)** to try the live demo - no installati
 - npm or yarn package manager
 - Git (for cloning the repository)
 - Google Gemini API key (optional, for AI features)
+- xAI API key (optional, for Grok AI features)
 
 ### Installation
 
@@ -56,13 +58,18 @@ Visit **[xpres.so](https://www.xpres.so/)** to try the live demo - no installati
    cp .env.example .env
    ```
 
-   Edit `.env` and add your Google Gemini API key:
+   Edit `.env` and add your API keys:
 
    ```
-   VITE_GOOGLE_GEMINI_API_KEY=your_api_key_here
+   # Google Gemini API key
+   VITE_GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
+
+   # xAI API key for Grok
+   VITE_XAI_API_KEY=your_xai_api_key_here
    ```
 
-   You can get a free API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Get a free Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Get an xAI API key from [x.ai/api](https://x.ai/api)
 
 4. **Start the development server**
    ```bash
@@ -80,7 +87,14 @@ Visit **[xpres.so](https://www.xpres.so/)** to try the live demo - no installati
 
 ### AI Slide Generation
 
-The AI slide generator powered by Google Gemini 2.0 Flash supports two modes:
+The AI slide generator supports multiple AI models and modes:
+
+**Available AI Models:**
+
+- 🔮 **Google Gemini 2.0 Flash** - Fast and efficient for structured content
+- ⚡ **xAI Grok-4 Fast** - Advanced reasoning for complex presentations
+
+You can select your preferred model from the dropdown in the Generate Slides dialog.
 
 **Traditional Markdown Mode:**
 
@@ -197,6 +211,7 @@ Set these in your Vercel dashboard under Project Settings → Environment Variab
 | Variable                     | Description                           | Required             |
 | ---------------------------- | ------------------------------------- | -------------------- |
 | `VITE_GOOGLE_GEMINI_API_KEY` | Google Gemini API key for AI features | No (but recommended) |
+| `VITE_XAI_API_KEY`           | xAI API key for Grok model            | No (optional)        |
 
 ### Deploy to Other Platforms
 
@@ -302,10 +317,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🚀 Recent Updates
 
+- **Multiple AI Models**: Added xAI Grok-4 Fast support alongside Google Gemini
 - **Live Demo Available**: Try it now at [xpres.so](https://www.xpres.so/)
 - **Vercel Deployment Ready**: Added configuration for easy deployment
 - **Fixed PDF Export**: Complete frame content capture with proper aspect ratios
-- **AI Slide Generation**: Integration with Google Gemini 2.0 Flash for intelligent text parsing
+- **AI Slide Generation**: Integration with Google Gemini 2.0 Flash and xAI Grok for intelligent text parsing
 - **Smart Text Wrapping**: Automatic text wrapping for better slide layouts
 - **Enhanced Export**: Using Excalidraw's native frame export for accurate PDF generation
 
