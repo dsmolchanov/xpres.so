@@ -6,68 +6,55 @@
       <stop offset="100%" style="stop-color:#4F46E5" />
     </linearGradient>
 
-    <!-- Cross-hatch pattern for texture -->
-    <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="3" height="3">
-      <path d="M0,3 l3,-3 M0,0 l3,3" stroke="#6965DB" stroke-width="0.4" opacity="0.25"/>
+    <!-- Cross-hatch pattern for texture fill -->
+    <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="2" height="2">
+      <path d="M0,2 l2,-2 M0,0 l2,2" stroke="#6965DB" stroke-width="0.15" opacity="0.3"/>
     </pattern>
   </defs>
 
-  <!-- X symbol - first diagonal (slightly wobbly) -->
-  <path d="M 4.5,7 Q 5,6.5 12,15.5 Q 12.3,16 12,16.5 Q 11.7,17 4.5,25 Q 4,25.5 3.5,25 Q 3,24.5 3.5,24 L 10.5,16 Q 11,15.5 10.5,15.5 L 3.5,8 Q 3,7.5 3.5,7 Q 4,6.5 4.5,7 Z"
-        fill="url(#gradient)"
-        opacity="0.95"/>
+  <!-- Simple X - two crossing diagonal lines with hand-drawn wobble -->
+  <!-- First diagonal line (top-left to bottom-right) -->
+  <path d="M 4,7 Q 4.2,7.2 8,12 Q 8.2,12.3 8.5,16 Q 8.3,16.3 9,20 Q 9.2,20.3 13,25 Q 13.2,25.2 13.5,25"
+        stroke="url(#gradient)"
+        stroke-width="2.5"
+        fill="none"
+        stroke-linecap="round"/>
 
-  <!-- X symbol - second diagonal (slightly wobbly) -->
-  <path d="M 12.5,7 Q 12,6.5 5,15.5 Q 4.7,16 5,16.5 Q 5.3,17 12.5,25 Q 13,25.5 13.5,25 Q 14,24.5 13.5,24 L 6.5,16 Q 6,15.5 6.5,15.5 L 13.5,8 Q 14,7.5 13.5,7 Q 13,6.5 12.5,7 Z"
-        fill="url(#gradient)"
-        opacity="0.95"/>
+  <!-- Second diagonal line (top-right to bottom-left) -->
+  <path d="M 13,7 Q 12.8,7.2 9,12 Q 8.8,12.3 8.5,16 Q 8.7,16.3 8,20 Q 7.8,20.3 4,25 Q 3.8,25.2 3.5,25"
+        stroke="url(#gradient)"
+        stroke-width="2.5"
+        fill="none"
+        stroke-linecap="round"/>
 
-  <!-- Cross-hatch overlay for X -->
-  <g opacity="0.6">
-    <rect x="3" y="6" width="11" height="20" fill="url(#crosshatch)"
-          mask="url(#xMask)"/>
+  <!-- Cross-hatch texture fill for X area -->
+  <g opacity="0.5">
+    <rect x="3" y="6" width="11" height="20" fill="url(#crosshatch)"/>
   </g>
 
-  <!-- Play triangle (slightly wobbly) -->
-  <path d="M 18.5,10 Q 19,9.5 19.5,10 L 27.5,15.5 Q 28,16 27.5,16.5 L 19.5,22 Q 19,22.5 18.5,22 Q 18,21.5 18,21 L 18,11 Q 18,10.5 18.5,10 Z"
+  <!-- Play triangle with hand-drawn edges -->
+  <path d="M 18,10 Q 18.2,9.8 18.5,10 Q 18.8,10.2 22,13 Q 22.3,13.3 26,15.5 Q 26.3,15.8 26.5,16 Q 26.3,16.2 26,16.5 Q 25.8,16.8 22,19 Q 21.8,19.3 18.5,22 Q 18.2,22.2 18,22 Q 17.8,21.8 17.5,21.5 Q 17.3,21.2 17.5,16 Q 17.7,15.8 17.5,15.5 Q 17.3,15.2 17.5,10.5 Q 17.7,10.2 18,10 Z"
         fill="url(#gradient)"
-        opacity="0.95"/>
+        stroke="url(#gradient)"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
 
-  <!-- Cross-hatch overlay for play -->
-  <g opacity="0.6">
-    <rect x="17" y="9" width="12" height="14" fill="url(#crosshatch)"
-          mask="url(#playMask)"/>
+  <!-- Cross-hatch texture fill for play triangle -->
+  <g opacity="0.5">
+    <path d="M 18,10 L 26.5,16 L 18,22 Z" fill="url(#crosshatch)"/>
   </g>
 
-  <!-- Subtle hand-drawn texture lines -->
-  <g opacity="0.3">
-    <!-- X texture -->
-    <path d="M 5,8.5 Q 5.5,8.7 6,8.5 M 7.5,11 Q 8,11.2 8.5,11 M 10,13.5 Q 10.5,13.7 11,13.5"
-          stroke="url(#gradient)"
-          stroke-width="0.5"
-          fill="none"/>
+  <!-- Additional hand-drawn texture lines -->
+  <g opacity="0.2">
+    <!-- Random scribbles on X -->
+    <path d="M 5,9 Q 5.5,9.2 6,9" stroke="url(#gradient)" stroke-width="0.3" fill="none"/>
+    <path d="M 7,14 Q 7.5,14.2 8,14" stroke="url(#gradient)" stroke-width="0.3" fill="none"/>
+    <path d="M 9,19 Q 9.5,19.2 10,19" stroke="url(#gradient)" stroke-width="0.3" fill="none"/>
 
-    <!-- Play texture -->
-    <path d="M 20,12 Q 20.5,12.2 21,12 M 22,15 Q 22.5,15.2 23,15 M 20.5,18 Q 21,18.2 21.5,18"
-          stroke="url(#gradient)"
-          stroke-width="0.5"
-          fill="none"/>
+    <!-- Random scribbles on play -->
+    <path d="M 20,12 Q 20.5,12.2 21,12" stroke="url(#gradient)" stroke-width="0.3" fill="none"/>
+    <path d="M 22,16 Q 22.5,16.2 23,16" stroke="url(#gradient)" stroke-width="0.3" fill="none"/>
+    <path d="M 21,19 Q 21.5,19.2 22,19" stroke="url(#gradient)" stroke-width="0.3" fill="none"/>
   </g>
-
-  <!-- Masks for cross-hatch application -->
-  <defs>
-    <mask id="xMask">
-      <rect width="32" height="32" fill="white"/>
-      <path d="M 4.5,7 Q 5,6.5 12,15.5 Q 12.3,16 12,16.5 Q 11.7,17 4.5,25 Q 4,25.5 3.5,25 Q 3,24.5 3.5,24 L 10.5,16 Q 11,15.5 10.5,15.5 L 3.5,8 Q 3,7.5 3.5,7 Q 4,6.5 4.5,7 Z"
-            fill="white"/>
-      <path d="M 12.5,7 Q 12,6.5 5,15.5 Q 4.7,16 5,16.5 Q 5.3,17 12.5,25 Q 13,25.5 13.5,25 Q 14,24.5 13.5,24 L 6.5,16 Q 6,15.5 6.5,15.5 L 13.5,8 Q 14,7.5 13.5,7 Q 13,6.5 12.5,7 Z"
-            fill="white"/>
-    </mask>
-
-    <mask id="playMask">
-      <rect width="32" height="32" fill="white"/>
-      <path d="M 18.5,10 Q 19,9.5 19.5,10 L 27.5,15.5 Q 28,16 27.5,16.5 L 19.5,22 Q 19,22.5 18.5,22 Q 18,21.5 18,21 L 18,11 Q 18,10.5 18.5,10 Z"
-            fill="white"/>
-    </mask>
-  </defs>
 </svg>
