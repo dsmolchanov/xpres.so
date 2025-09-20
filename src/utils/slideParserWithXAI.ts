@@ -1,6 +1,6 @@
-import { ParsedSlide } from './slideTypes';
-import { xaiService } from './xaiService';
-import { SlideParser } from './slideParser';
+import { ParsedSlide } from "./slideTypes";
+import { xaiService } from "./xaiService";
+import { SlideParser } from "./slideParser";
 
 interface StructuredSlide {
   title?: string;
@@ -17,23 +17,28 @@ interface StructuredSlide {
 class SlideParserWithXAI extends SlideParser {
   async parseWithXAI(input: string): Promise<ParsedSlide[]> {
     try {
-      console.log('Parsing text with xAI Grok...');
+      console.log("Parsing text with xAI Grok...");
       const presentation = await xaiService.parseTextToSlides(input);
 
-      console.log('xAI response:', presentation);
+      console.log("xAI response:", presentation);
 
       // Convert structured slides to ParsedSlide format
-      return presentation.slides.map(slide => this.convertStructuredSlide(slide));
+      return presentation.slides.map((slide) =>
+        this.convertStructuredSlide(slide),
+      );
     } catch (error) {
-      console.error('xAI parsing failed, falling back to traditional parsing:', error);
-      // Fallback to traditional markdown parsing
-      return this.parseMarkdown(input);
+      console.error(
+        "xAI parsing failed, falling back to traditional parsing:",
+        error,
+      );
+      // Fallback to traditional markdown parsing - use the inherited parse method
+      return this.parse(input);
     }
   }
 
   private convertStructuredSlide(slide: StructuredSlide): ParsedSlide {
     const parsed: ParsedSlide = {
-      content: slide.content || []
+      content: slide.content || [],
     };
 
     if (slide.title) {
@@ -47,7 +52,7 @@ class SlideParserWithXAI extends SlideParser {
     if (slide.code && slide.code.content) {
       parsed.code = {
         content: slide.code.content,
-        language: slide.code.language || 'javascript'
+        language: slide.code.language || "javascript",
       };
     }
 

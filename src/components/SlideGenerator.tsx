@@ -112,6 +112,10 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
           slides = await parseTextWithAI(input);
         } else if (selectedModel === "xai") {
           slides = await parseTextWithXAI(input);
+        } else {
+          // Fallback for any unexpected model value
+          console.log("Unknown AI model, falling back to markdown parsing");
+          slides = parseMarkdownToSlides(input);
         }
         console.log("AI parsed slides:", slides);
       } else {
