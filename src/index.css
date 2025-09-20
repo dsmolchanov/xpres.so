@@ -79,11 +79,11 @@ body,
 
 .toolbar-buttons {
     position: fixed;
-    top: 18px;
-    right: 18px;
+    bottom: 16px;
+    right: 16px;
     display: flex;
     gap: 0.5rem;
-    z-index: 999;
+    z-index: 4; /* Same z-index as Excalidraw's UI elements */
 }
 
 .toolbar-button {
