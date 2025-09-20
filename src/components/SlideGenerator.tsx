@@ -8,7 +8,18 @@ import {
 } from "../utils/excalidrawGenerator";
 import { geminiService } from "../utils/geminiService";
 import { xaiService } from "../utils/xaiService";
-import { FileText, Wand2, X, Settings, Sparkles, Zap } from "lucide-react";
+import {
+  FileText,
+  Wand2,
+  X,
+  Settings,
+  Sparkles,
+  Zap,
+  ChevronLeft,
+  ChevronRight,
+  Palette,
+} from "lucide-react";
+import { colorPalettes, getPaletteByIndex } from "../utils/colorPalettes";
 
 interface SlideGeneratorProps {
   onGenerate: (data: { elements: any[]; appState: any }) => void;
@@ -76,6 +87,8 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
   const [selectedModel, setSelectedModel] =
     useState<AIModel>(getDefaultModel());
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedPaletteIndex, setSelectedPaletteIndex] = useState(0);
+  const selectedPalette = getPaletteByIndex(selectedPaletteIndex);
   const [options, setOptions] = useState<GeneratorOptions>({
     slideWidth: 800,
     slideHeight: 600,
@@ -87,6 +100,7 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
     codeFontSize: 16,
     fontFamily: 1,
     theme: "light",
+    colorPalette: selectedPalette,
   });
 
   const handleGenerate = async () => {
@@ -137,7 +151,10 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
 
       console.log("Generating Excalidraw presentation...");
       console.log("Options:", options);
-      const excalidrawData = generateExcalidrawPresentation(slides, options);
+      const excalidrawData = generateExcalidrawPresentation(slides, {
+        ...options,
+        colorPalette: selectedPalette,
+      });
       console.log("Generated Excalidraw data:", excalidrawData);
       console.log("Number of elements:", excalidrawData.elements?.length || 0);
       console.log("First 3 elements:", excalidrawData.elements?.slice(0, 3));
@@ -328,6 +345,133 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                 </p>
               </div>
             )}
+          </div>
+
+          <div
+            style={{
+              padding: "12px",
+              backgroundColor: "#f9f9f9",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              marginBottom: "12px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+              }}
+            >
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <Palette size={18} color="#666" />
+                <span
+                  style={{ fontSize: "14px", fontWeight: "500", color: "#333" }}
+                >
+                  Color Theme:
+                </span>
+              </div>
+
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <button
+                  onClick={() => {
+                    const newIndex =
+                      selectedPaletteIndex === 0
+                        ? colorPalettes.length - 1
+                        : selectedPaletteIndex - 1;
+                    setSelectedPaletteIndex(newIndex);
+                  }}
+                  style={{
+                    background: "none",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    padding: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "4px 12px",
+                    backgroundColor: "white",
+                    border: "1px solid #ddd",
+                    borderRadius: "6px",
+                    minWidth: "150px",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                    {selectedPalette.name}
+                  </span>
+                  <div style={{ display: "flex", gap: "2px" }}>
+                    <div
+                      style={{
+                        width: "12px",
+                        height: "12px",
+                        backgroundColor: selectedPalette.background,
+                        border: "1px solid #ccc",
+                        borderRadius: "2px",
+                      }}
+                    />
+                    <div
+                      style={{
+                        width: "12px",
+                        height: "12px",
+                        backgroundColor: selectedPalette.primary,
+                        borderRadius: "2px",
+                      }}
+                    />
+                    <div
+                      style={{
+                        width: "12px",
+                        height: "12px",
+                        backgroundColor: selectedPalette.secondary,
+                        borderRadius: "2px",
+                      }}
+                    />
+                    <div
+                      style={{
+                        width: "12px",
+                        height: "12px",
+                        backgroundColor: selectedPalette.accent,
+                        borderRadius: "2px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    const newIndex =
+                      (selectedPaletteIndex + 1) % colorPalettes.length;
+                    setSelectedPaletteIndex(newIndex);
+                  }}
+                  style={{
+                    background: "none",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    padding: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
           </div>
 
           <p style={{ margin: "0 0 12px 0", color: "#666", fontSize: "14px" }}>

@@ -1,4 +1,5 @@
 import { ParsedSlide } from "./slideTypes";
+import { ColorPalette, getDefaultPalette } from "./colorPalettes";
 
 export interface ExcalidrawElement {
   id: string;
@@ -49,6 +50,7 @@ export interface GeneratorOptions {
   codeFontSize?: number;
   fontFamily?: number;
   theme?: "light" | "dark";
+  colorPalette?: ColorPalette;
 }
 
 const DEFAULT_OPTIONS: GeneratorOptions = {
@@ -62,6 +64,7 @@ const DEFAULT_OPTIONS: GeneratorOptions = {
   codeFontSize: 24,
   fontFamily: 1,
   theme: "light",
+  colorPalette: getDefaultPalette(),
 };
 
 function generateId(): string {
@@ -74,7 +77,7 @@ function createFrame(
   width: number,
   height: number,
   name: string,
-  theme: "light" | "dark",
+  palette: ColorPalette,
 ): ExcalidrawElement {
   return {
     id: generateId(),
@@ -84,8 +87,8 @@ function createFrame(
     width,
     height,
     angle: 0,
-    strokeColor: theme === "dark" ? "#ffffff" : "#000000",
-    backgroundColor: "transparent",
+    strokeColor: palette.border,
+    backgroundColor: palette.background,
     fillStyle: "solid",
     strokeWidth: 2,
     strokeStyle: "solid",
@@ -130,6 +133,7 @@ function createTextElement(
   fontSize: number,
   fontFamily: number,
   frameId: string | null,
+  color: string,
 ): ExcalidrawElement[] {
   const lines = wrapText(text);
   const lineHeight = fontSize * 1.5;
@@ -142,7 +146,7 @@ function createTextElement(
     width: line.length * (fontSize * 0.6),
     height: fontSize * 1.25,
     angle: 0,
-    strokeColor: "#000000",
+    strokeColor: color,
     backgroundColor: "transparent",
     fillStyle: "solid",
     strokeWidth: 2,
@@ -176,6 +180,7 @@ export function generateExcalidrawSlides(
   options: GeneratorOptions = {},
 ): ExcalidrawElement[] {
   const opts = { ...DEFAULT_OPTIONS, ...options };
+  const palette = opts.colorPalette || getDefaultPalette();
   const elements: ExcalidrawElement[] = [];
   let currentX = 0;
   let currentY = 0;
@@ -191,7 +196,7 @@ export function generateExcalidrawSlides(
       opts.slideWidth!,
       opts.slideHeight!,
       slideName,
-      opts.theme!,
+      palette,
     );
     frame.id = frameId;
     elements.push(frame);
@@ -206,6 +211,7 @@ export function generateExcalidrawSlides(
         opts.titleFontSize!,
         opts.fontFamily!,
         frameId,
+        palette.primary,
       );
       elements.push(...titleElements);
       contentY += opts.titleFontSize! * 2;
@@ -220,6 +226,7 @@ export function generateExcalidrawSlides(
           opts.bulletFontSize!,
           opts.fontFamily!,
           frameId,
+          palette.accent,
         );
         elements.push(...bulletElements);
         contentY += bulletElements.length * (opts.bulletFontSize! * 1.5) + 10;
@@ -233,6 +240,7 @@ export function generateExcalidrawSlides(
           opts.contentFontSize!,
           opts.fontFamily!,
           frameId,
+          palette.secondary,
         );
         elements.push(...contentElements);
         contentY += contentElements.length * (opts.contentFontSize! * 1.5) + 10;
@@ -247,6 +255,7 @@ export function generateExcalidrawSlides(
         opts.codeFontSize!,
         3,
         frameId,
+        palette.codeText,
       );
       elements.push(...codeElements);
       contentY += codeElements.length * (opts.codeFontSize! * 1.5) + 20;
@@ -261,6 +270,7 @@ export function generateExcalidrawSlides(
         opts.contentFontSize! * 0.75,
         opts.fontFamily!,
         frameId,
+        palette.secondary,
       );
       elements.push(...notesElements);
     }
@@ -282,13 +292,15 @@ export function generateExcalidrawPresentation(
   slides: ParsedSlide[],
   options: GeneratorOptions = {},
 ): { elements: ExcalidrawElement[]; appState: any } {
+  const opts = { ...DEFAULT_OPTIONS, ...options };
+  const palette = opts.colorPalette || getDefaultPalette();
   const elements = generateExcalidrawSlides(slides, options);
 
   return {
     elements,
     appState: {
-      viewBackgroundColor: "#ffffff",
-      currentItemStrokeColor: "#000000",
+      viewBackgroundColor: palette.background,
+      currentItemStrokeColor: palette.primary,
       currentItemBackgroundColor: "transparent",
       currentItemFillStyle: "solid",
       currentItemStrokeWidth: 2,
