@@ -409,7 +409,6 @@ function App() {
     [excalidrawAPI, updateFrames, frames.length, navigateToFrame],
   );
 
-
   // Handle fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -433,43 +432,33 @@ function App() {
       )}
 
       {!isPresenting && (
-        <div className="presentation-hint">
+        <div className="toolbar-buttons">
           <button
-            className="start-presentation-button"
+            className="toolbar-button"
+            onClick={() => setShowSlideGenerator(true)}
+            title="Generate slides from text"
+            aria-label="Generate slides"
+          >
+            <Wand2 size={20} />
+          </button>
+          <button
+            className="toolbar-button"
             onClick={togglePresentation}
             title="Start Presentation (P)"
             disabled={frames.length === 0}
+            aria-label="Start presentation"
           >
-            <Play size={18} />
-            Start Presentation
+            <Play size={20} />
           </button>
           <button
-            className="generate-slides-button"
-            onClick={() => setShowSlideGenerator(true)}
-            title="Generate slides from text"
-            style={{
-              marginLeft: "8px",
-              padding: "8px 12px",
-              backgroundColor: "#6965db",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontSize: "14px",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
+            className="toolbar-button"
+            onClick={handleExportPDF}
+            title="Export frames to PDF"
+            disabled={frames.length === 0}
+            aria-label="Export to PDF"
           >
-            <Wand2 size={16} />
-            Generate Slides
+            <FileDown size={20} />
           </button>
-          {frames.length === 0 && (
-            <div className="frames-hint">
-              Use the Frame tool (F key) to create frames around your content or
-              generate slides from text
-            </div>
-          )}
         </div>
       )}
 
@@ -550,29 +539,6 @@ function App() {
               viewBackgroundColor: "#ffffff",
             },
           }}
-          renderTopRightUI={() => (
-            <button
-              onClick={handleExportPDF}
-              disabled={frames.length === 0}
-              style={{
-                padding: "8px 12px",
-                backgroundColor: frames.length === 0 ? "#e0e0e0" : "#6965db",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: frames.length === 0 ? "not-allowed" : "pointer",
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                marginRight: "8px",
-              }}
-              title="Export all frames to PDF"
-            >
-              <FileDown size={16} />
-              Export PDF
-            </button>
-          )}
         />
       </div>
     </div>
