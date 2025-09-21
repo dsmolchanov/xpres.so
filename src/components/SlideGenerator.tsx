@@ -14,7 +14,6 @@ import {
   X,
   Settings,
   Sparkles,
-  Zap,
   ChevronLeft,
   ChevronRight,
   Palette,
@@ -150,14 +149,13 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
       }
 
       console.log("Generating Excalidraw presentation...");
-      console.log("Options:", options);
-      const excalidrawData = generateExcalidrawPresentation(slides, {
-        ...options,
-        colorPalette: selectedPalette,
-      });
+      const updatedOptions = { ...options, colorPalette: selectedPalette };
+      const excalidrawData = generateExcalidrawPresentation(
+        slides,
+        updatedOptions,
+      );
+
       console.log("Generated Excalidraw data:", excalidrawData);
-      console.log("Number of elements:", excalidrawData.elements?.length || 0);
-      console.log("First 3 elements:", excalidrawData.elements?.slice(0, 3));
 
       console.log("Calling onGenerate callback...");
       onGenerate(excalidrawData);
@@ -180,11 +178,27 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
   const getModelDisplayName = (model: AIModel): string => {
     switch (model) {
       case "gemini":
-        return "Google Gemini 2.0 Flash";
+        return "Gemini 2.0";
       case "xai":
-        return "xAI Grok-4 Fast";
+        return "Grok-4 Fast";
       default:
         return "No AI";
+    }
+  };
+
+  // Toggle between available models
+  const toggleModel = () => {
+    if (!anyAIAvailable) return;
+
+    if (geminiAvailable && xaiAvailable) {
+      // Both available - toggle between them
+      setSelectedModel(selectedModel === "gemini" ? "xai" : "gemini");
+    } else if (geminiAvailable) {
+      // Only Gemini available
+      setSelectedModel("gemini");
+    } else if (xaiAvailable) {
+      // Only xAI available
+      setSelectedModel("xai");
     }
   };
 
@@ -196,7 +210,7 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -205,153 +219,198 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
     >
       <div
         style={{
-          backgroundColor: "white",
-          borderRadius: "12px",
-          padding: "24px",
+          backgroundColor: "#fff",
+          border: "1px solid #e5e5e5",
+          borderRadius: "8px",
+          padding: "20px",
           width: "90%",
-          maxWidth: "800px",
-          maxHeight: "80vh",
+          maxWidth: "700px",
+          maxHeight: "85vh",
           display: "flex",
           flexDirection: "column",
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0 1px 5px rgba(0, 0, 0, 0.15)",
         }}
       >
+        {/* Header */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "20px",
+            marginBottom: "16px",
+            paddingBottom: "12px",
+            borderBottom: "1px solid #e5e5e5",
           }}
         >
-          <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "bold" }}>
-            Generate Slides from Text
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "20px",
+              fontWeight: 600,
+              color: "#1e1e1e",
+              fontFamily:
+                "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            }}
+          >
+            Generate Slides
           </h2>
           <button
             onClick={onClose}
             style={{
-              background: "none",
+              width: "32px",
+              height: "32px",
               border: "none",
+              borderRadius: "8px",
+              background: "transparent",
               cursor: "pointer",
-              padding: "4px",
+              padding: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.1s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#f3f3f3";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
             }}
           >
-            <X size={24} />
+            <X size={20} color="#1e1e1e" />
           </button>
         </div>
 
-        <div style={{ marginBottom: "16px" }}>
-          <div style={{ marginBottom: "12px" }}>
-            {anyAIAvailable ? (
+        <div style={{ marginBottom: "12px" }}>
+          {/* AI Toggle Section */}
+          {anyAIAvailable ? (
+            <div
+              style={{
+                padding: "12px",
+                backgroundColor: useAI ? "#f8f9fa" : "#fff",
+                border: `1px solid ${useAI ? "#6965db" : "#e5e5e5"}`,
+                borderRadius: "8px",
+                marginBottom: "12px",
+                transition: "all 0.2s",
+              }}
+            >
               <div
                 style={{
-                  padding: "12px",
-                  backgroundColor: useAI ? "#f0f9ff" : "#f9f9f9",
-                  border: useAI ? "1px solid #3b82f6" : "1px solid #ddd",
-                  borderRadius: "8px",
-                  marginBottom: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                 }}
               >
-                <div
+                <label
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "12px",
-                    flexWrap: "wrap",
+                    gap: "8px",
+                    cursor: "pointer",
+                    flex: 1,
                   }}
                 >
-                  <label
+                  <input
+                    type="checkbox"
+                    checked={useAI}
+                    onChange={(e) => {
+                      setUseAI(e.target.checked);
+                      if (e.target.checked && selectedModel === "none") {
+                        setSelectedModel(getDefaultModel());
+                      }
+                    }}
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
+                      width: "16px",
+                      height: "16px",
                       cursor: "pointer",
                     }}
+                  />
+                  <Sparkles size={16} color={useAI ? "#6965db" : "#999"} />
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      color: useAI ? "#1e1e1e" : "#999",
+                    }}
                   >
-                    <input
-                      type="checkbox"
-                      checked={useAI}
-                      onChange={(e) => {
-                        setUseAI(e.target.checked);
-                        if (e.target.checked && selectedModel === "none") {
-                          setSelectedModel(getDefaultModel());
-                        }
-                      }}
-                      style={{ width: "18px", height: "18px" }}
-                    />
-                    <Sparkles size={18} color={useAI ? "#3b82f6" : "#666"} />
-                    <span
-                      style={{
-                        fontWeight: useAI ? "bold" : "normal",
-                        color: useAI ? "#3b82f6" : "#333",
-                      }}
-                    >
-                      Use AI to parse text
-                    </span>
-                  </label>
+                    Use AI to parse text
+                  </span>
+                </label>
 
-                  {useAI && (
-                    <select
-                      value={selectedModel}
-                      onChange={(e) =>
-                        setSelectedModel(e.target.value as AIModel)
+                {/* Model Toggle */}
+                {useAI && (geminiAvailable || xaiAvailable) && (
+                  <button
+                    onClick={toggleModel}
+                    disabled={!(geminiAvailable && xaiAvailable)}
+                    style={{
+                      padding: "6px 12px",
+                      border: "1px solid #e5e5e5",
+                      borderRadius: "6px",
+                      backgroundColor: "#fff",
+                      cursor:
+                        geminiAvailable && xaiAvailable ? "pointer" : "default",
+                      fontSize: "13px",
+                      fontWeight: 500,
+                      color: "#1e1e1e",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "all 0.1s",
+                      minWidth: "120px",
+                      justifyContent: "center",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (geminiAvailable && xaiAvailable) {
+                        e.currentTarget.style.backgroundColor = "#f3f3f3";
                       }
-                      style={{
-                        padding: "4px 8px",
-                        border: "1px solid #3b82f6",
-                        borderRadius: "6px",
-                        backgroundColor: "white",
-                        color: "#3b82f6",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {geminiAvailable && (
-                        <option value="gemini">🔮 Gemini 2.0 Flash</option>
-                      )}
-                      {xaiAvailable && (
-                        <option value="xai">⚡ Grok-4 Fast</option>
-                      )}
-                    </select>
-                  )}
-                </div>
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#fff";
+                    }}
+                  >
+                    {selectedModel === "gemini" ? (
+                      <>🔮 {getModelDisplayName("gemini")}</>
+                    ) : (
+                      <>⚡ {getModelDisplayName("xai")}</>
+                    )}
+                  </button>
+                )}
+              </div>
 
+              {useAI && (
                 <p
                   style={{
-                    margin: "8px 0 0 26px",
-                    fontSize: "13px",
-                    color: "#666",
+                    margin: "8px 0 0 24px",
+                    fontSize: "12px",
+                    color: "#999",
                   }}
                 >
-                  {useAI
-                    ? `AI (${getModelDisplayName(selectedModel)}) will intelligently structure your text into slides`
-                    : "Using traditional markdown parsing (separate slides with ---)"}
+                  AI will intelligently structure your text into slides
                 </p>
-              </div>
-            ) : (
-              <div
-                style={{
-                  padding: "12px",
-                  backgroundColor: "#fef3c7",
-                  border: "1px solid #f59e0b",
-                  borderRadius: "8px",
-                  marginBottom: "12px",
-                }}
-              >
-                <p style={{ margin: 0, fontSize: "13px", color: "#92400e" }}>
-                  ⚠️ No AI API keys configured. Add VITE_GOOGLE_GEMINI_API_KEY
-                  or VITE_XAI_API_KEY to your .env file to enable AI parsing.
-                </p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <div
+              style={{
+                padding: "12px",
+                backgroundColor: "#fef3c7",
+                border: "1px solid #f59e0b",
+                borderRadius: "8px",
+                marginBottom: "12px",
+              }}
+            >
+              <p style={{ margin: 0, fontSize: "13px", color: "#92400e" }}>
+                ⚠️ No AI API keys configured. Add VITE_GOOGLE_GEMINI_API_KEY or
+                VITE_XAI_API_KEY to your .env file to enable AI parsing.
+              </p>
+            </div>
+          )}
 
+          {/* Color Palette Section */}
           <div
             style={{
               padding: "12px",
-              backgroundColor: "#f9f9f9",
-              border: "1px solid #ddd",
+              backgroundColor: "#f8f9fa",
+              border: "1px solid #e5e5e5",
               borderRadius: "8px",
               marginBottom: "12px",
             }}
@@ -361,17 +420,20 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                gap: "12px",
               }}
             >
               <div
                 style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
-                <Palette size={18} color="#666" />
+                <Palette size={16} color="#999" />
                 <span
-                  style={{ fontSize: "14px", fontWeight: "500", color: "#333" }}
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    color: "#1e1e1e",
+                  }}
                 >
-                  Color Theme:
+                  Color Theme
                 </span>
               </div>
 
@@ -387,16 +449,26 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                     setSelectedPaletteIndex(newIndex);
                   }}
                   style={{
-                    background: "none",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
+                    width: "28px",
+                    height: "28px",
+                    background: "#fff",
+                    border: "1px solid #e5e5e5",
+                    borderRadius: "6px",
                     cursor: "pointer",
-                    padding: "4px",
+                    padding: 0,
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
+                    transition: "all 0.1s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f3f3f3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#fff";
                   }}
                 >
-                  <ChevronLeft size={16} />
+                  <ChevronLeft size={16} color="#1e1e1e" />
                 </button>
 
                 <div
@@ -404,49 +476,49 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
-                    padding: "4px 12px",
-                    backgroundColor: "white",
-                    border: "1px solid #ddd",
+                    padding: "4px 10px",
+                    backgroundColor: "#fff",
+                    border: "1px solid #e5e5e5",
                     borderRadius: "6px",
-                    minWidth: "150px",
-                    justifyContent: "center",
+                    minWidth: "140px",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 500,
+                      color: "#1e1e1e",
+                    }}
+                  >
                     {selectedPalette.name}
                   </span>
-                  <div style={{ display: "flex", gap: "2px" }}>
+                  <div style={{ display: "flex", gap: "4px" }}>
                     <div
                       style={{
-                        width: "12px",
-                        height: "12px",
+                        width: "16px",
+                        height: "16px",
                         backgroundColor: selectedPalette.background,
-                        border: "1px solid #ccc",
-                        borderRadius: "2px",
+                        border: "1px solid #e5e5e5",
+                        borderRadius: "4px",
                       }}
                     />
                     <div
                       style={{
-                        width: "12px",
-                        height: "12px",
+                        width: "16px",
+                        height: "16px",
                         backgroundColor: selectedPalette.primary,
-                        borderRadius: "2px",
+                        border: "1px solid #e5e5e5",
+                        borderRadius: "4px",
                       }}
                     />
                     <div
                       style={{
-                        width: "12px",
-                        height: "12px",
-                        backgroundColor: selectedPalette.secondary,
-                        borderRadius: "2px",
-                      }}
-                    />
-                    <div
-                      style={{
-                        width: "12px",
-                        height: "12px",
+                        width: "16px",
+                        height: "16px",
                         backgroundColor: selectedPalette.accent,
-                        borderRadius: "2px",
+                        border: "1px solid #e5e5e5",
+                        borderRadius: "4px",
                       }}
                     />
                   </div>
@@ -459,81 +531,107 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                     setSelectedPaletteIndex(newIndex);
                   }}
                   style={{
-                    background: "none",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
+                    width: "28px",
+                    height: "28px",
+                    background: "#fff",
+                    border: "1px solid #e5e5e5",
+                    borderRadius: "6px",
                     cursor: "pointer",
-                    padding: "4px",
+                    padding: 0,
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
+                    transition: "all 0.1s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f3f3f3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#fff";
                   }}
                 >
-                  <ChevronRight size={16} />
+                  <ChevronRight size={16} color="#1e1e1e" />
                 </button>
               </div>
             </div>
           </div>
 
-          <p style={{ margin: "0 0 12px 0", color: "#666", fontSize: "14px" }}>
-            {useAI
-              ? "Paste any text - structured or unstructured. AI will organize it into slides."
-              : "Enter markdown-formatted text with slides separated by --- (three dashes)"}
-          </p>
+          {/* Action Buttons */}
           <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
             <button
               onClick={loadSample}
               style={{
-                padding: "6px 12px",
-                backgroundColor: "#f0f0f0",
-                border: "1px solid #ddd",
+                padding: "8px 12px",
+                backgroundColor: "#fff",
+                border: "1px solid #e5e5e5",
                 borderRadius: "6px",
                 cursor: "pointer",
-                fontSize: "14px",
+                fontSize: "13px",
+                fontWeight: 500,
+                color: "#1e1e1e",
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
+                transition: "all 0.1s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#f3f3f3";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#fff";
               }}
             >
-              <FileText size={16} />
+              <FileText size={14} />
               Load Sample
             </button>
             <button
               onClick={() => setShowOptions(!showOptions)}
               style={{
-                padding: "6px 12px",
-                backgroundColor: "#f0f0f0",
-                border: "1px solid #ddd",
+                padding: "8px 12px",
+                backgroundColor: "#fff",
+                border: "1px solid #e5e5e5",
                 borderRadius: "6px",
                 cursor: "pointer",
-                fontSize: "14px",
+                fontSize: "13px",
+                fontWeight: 500,
+                color: "#1e1e1e",
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
+                transition: "all 0.1s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#f3f3f3";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#fff";
               }}
             >
-              <Settings size={16} />
+              <Settings size={14} />
               Options
             </button>
           </div>
         </div>
 
+        {/* Options Panel */}
         {showOptions && (
           <div
             style={{
-              backgroundColor: "#f9f9f9",
-              padding: "16px",
+              backgroundColor: "#f8f9fa",
+              padding: "12px",
               borderRadius: "8px",
-              marginBottom: "16px",
+              marginBottom: "12px",
+              border: "1px solid #e5e5e5",
               display: "grid",
               gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "12px",
-              fontSize: "14px",
+              gap: "10px",
+              fontSize: "13px",
             }}
           >
             <label
               style={{ display: "flex", flexDirection: "column", gap: "4px" }}
             >
-              Slide Width:
+              <span style={{ color: "#666", fontSize: "12px" }}>Width</span>
               <input
                 type="number"
                 value={options.slideWidth}
@@ -542,15 +640,17 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                 }
                 style={{
                   padding: "4px 8px",
-                  border: "1px solid #ddd",
+                  border: "1px solid #e5e5e5",
                   borderRadius: "4px",
+                  backgroundColor: "#fff",
+                  fontSize: "13px",
                 }}
               />
             </label>
             <label
               style={{ display: "flex", flexDirection: "column", gap: "4px" }}
             >
-              Slide Height:
+              <span style={{ color: "#666", fontSize: "12px" }}>Height</span>
               <input
                 type="number"
                 value={options.slideHeight}
@@ -562,15 +662,17 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                 }
                 style={{
                   padding: "4px 8px",
-                  border: "1px solid #ddd",
+                  border: "1px solid #e5e5e5",
                   borderRadius: "4px",
+                  backgroundColor: "#fff",
+                  fontSize: "13px",
                 }}
               />
             </label>
             <label
               style={{ display: "flex", flexDirection: "column", gap: "4px" }}
             >
-              Grid Columns:
+              <span style={{ color: "#666", fontSize: "12px" }}>Columns</span>
               <input
                 type="number"
                 value={options.gridCols}
@@ -579,192 +681,105 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
                 }
                 style={{
                   padding: "4px 8px",
-                  border: "1px solid #ddd",
+                  border: "1px solid #e5e5e5",
                   borderRadius: "4px",
+                  backgroundColor: "#fff",
+                  fontSize: "13px",
                 }}
               />
             </label>
             <label
               style={{ display: "flex", flexDirection: "column", gap: "4px" }}
             >
-              Font Style:
-              <select
-                value={options.fontFamily}
-                onChange={(e) =>
-                  setOptions({ ...options, fontFamily: Number(e.target.value) })
-                }
-                style={{
-                  padding: "4px 8px",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                }}
-              >
-                <option value={1}>Hand-drawn</option>
-                <option value={2}>Normal</option>
-                <option value={3}>Code</option>
-              </select>
-            </label>
-            <label
-              style={{ display: "flex", flexDirection: "column", gap: "4px" }}
-            >
-              Title Size:
+              <span style={{ color: "#666", fontSize: "12px" }}>Spacing</span>
               <input
                 type="number"
-                value={options.titleFontSize}
+                value={options.slideSpacing}
                 onChange={(e) =>
                   setOptions({
                     ...options,
-                    titleFontSize: Number(e.target.value),
+                    slideSpacing: Number(e.target.value),
                   })
                 }
                 style={{
                   padding: "4px 8px",
-                  border: "1px solid #ddd",
+                  border: "1px solid #e5e5e5",
                   borderRadius: "4px",
-                }}
-              />
-            </label>
-            <label
-              style={{ display: "flex", flexDirection: "column", gap: "4px" }}
-            >
-              Content Size:
-              <input
-                type="number"
-                value={options.contentFontSize}
-                onChange={(e) =>
-                  setOptions({
-                    ...options,
-                    contentFontSize: Number(e.target.value),
-                  })
-                }
-                style={{
-                  padding: "4px 8px",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
+                  backgroundColor: "#fff",
+                  fontSize: "13px",
                 }}
               />
             </label>
           </div>
         )}
 
+        {/* Text Area */}
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={
             useAI
-              ? `Paste any text here. For example:
-
-"I want to create a presentation about climate change. Start with explaining what it is, then discuss the causes, show some statistics about temperature rise, and end with solutions we can implement."
-
-AI will automatically structure this into organized slides.`
-              : `# Slide 1 Title
-Content for slide 1
-
----
-
-# Slide 2 Title
-- Bullet point 1
-- Bullet point 2
-
----`
+              ? "Paste any text here - AI will organize it into slides..."
+              : "Enter markdown text with slides separated by ---"
           }
           style={{
             flex: 1,
             padding: "12px",
-            border: "1px solid #ddd",
+            border: "1px solid #e5e5e5",
             borderRadius: "8px",
             fontSize: "14px",
             fontFamily: "monospace",
             resize: "none",
-            minHeight: "300px",
+            minHeight: "200px",
+            backgroundColor: "#fff",
           }}
-          disabled={isProcessing}
         />
 
-        <div
+        {/* Generate Button */}
+        <button
+          onClick={handleGenerate}
+          disabled={isProcessing || !input.trim()}
           style={{
+            marginTop: "12px",
+            padding: "10px 20px",
+            backgroundColor:
+              isProcessing || !input.trim() ? "#e5e5e5" : "#6965db",
+            color: isProcessing || !input.trim() ? "#999" : "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: isProcessing || !input.trim() ? "not-allowed" : "pointer",
+            fontSize: "14px",
+            fontWeight: 600,
             display: "flex",
-            justifyContent: "flex-end",
-            gap: "12px",
-            marginTop: "20px",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            transition: "all 0.1s",
+          }}
+          onMouseEnter={(e) => {
+            if (!isProcessing && input.trim()) {
+              e.currentTarget.style.backgroundColor = "#5a56d1";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isProcessing && input.trim()) {
+              e.currentTarget.style.backgroundColor = "#6965db";
+            }
           }}
         >
-          <button
-            onClick={onClose}
-            disabled={isProcessing}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#f0f0f0",
-              color: "#333",
-              border: "none",
-              borderRadius: "6px",
-              cursor: isProcessing ? "not-allowed" : "pointer",
-              fontSize: "16px",
-              opacity: isProcessing ? 0.5 : 1,
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleGenerate}
-            disabled={!input.trim() || isProcessing}
-            style={{
-              padding: "10px 20px",
-              backgroundColor:
-                input.trim() && !isProcessing
-                  ? useAI
-                    ? selectedModel === "xai"
-                      ? "#000000"
-                      : "#3b82f6"
-                    : "#6965db"
-                  : "#e0e0e0",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: input.trim() && !isProcessing ? "pointer" : "not-allowed",
-              fontSize: "16px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            {isProcessing ? (
-              <>
-                <div
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    border: "2px solid #fff",
-                    borderTopColor: "transparent",
-                    borderRadius: "50%",
-                    animation: "spin 1s linear infinite",
-                  }}
-                />
-                Processing...
-              </>
-            ) : (
-              <>
-                {useAI ? (
-                  selectedModel === "xai" ? (
-                    <Zap size={18} />
-                  ) : (
-                    <Sparkles size={18} />
-                  )
-                ) : (
-                  <Wand2 size={18} />
-                )}
-                Generate Slides
-              </>
-            )}
-          </button>
-        </div>
+          {isProcessing ? (
+            <>
+              <span className="loading-spinner" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Wand2 size={16} />
+              Generate Slides
+            </>
+          )}
+        </button>
       </div>
-
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };
