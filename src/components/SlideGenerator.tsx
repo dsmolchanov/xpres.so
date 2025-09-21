@@ -78,8 +78,8 @@ export const SlideGenerator: React.FC<SlideGeneratorProps> = ({
 
   // Set default AI model based on availability
   const getDefaultModel = (): AIModel => {
-    if (geminiAvailable) return "gemini";
     if (xaiAvailable) return "xai";
+    if (geminiAvailable) return "gemini";
     return "none";
   };
 

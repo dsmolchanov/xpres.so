@@ -2,7 +2,7 @@
 
   <br/>
 
-  <img src="public/logo.svg" alt="xpres.so logo" width="600" height="400" />
+  <img src="public/xpres-logo.svg" alt="xpres.so logo" width="600" height="400" />
 
   <br/>
   <br/>
